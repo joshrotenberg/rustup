@@ -9,11 +9,11 @@ fn utils_remove_file() {
     File::create(&f_path).unwrap();
 
     assert!(f_path.exists());
+
     assert!(remove_file("f", &f_path).is_ok());
     assert!(!f_path.exists());
 
     let result = remove_file("f", &f_path);
-    // assert!(result.is_err());
     let err = result.unwrap_err();
 
     match err.downcast_ref::<RustupError>() {
@@ -23,4 +23,18 @@ fn utils_remove_file() {
         }
         _ => panic!(),
     }
+}
+
+#[test]
+fn utils_ensure_file_removed() {
+    let tempdir = tempfile::Builder::new().prefix("rustup").tempdir().unwrap();
+    let f_path = tempdir.path().join("f");
+    File::create(&f_path).unwrap();
+
+    assert!(f_path.exists());
+
+    assert!(ensure_file_removed("f", &f_path).is_ok());
+
+    assert!(!f_path.exists());
+    assert!(ensure_file_removed("f", &f_path).is_ok());
 }
