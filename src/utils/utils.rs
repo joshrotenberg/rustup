@@ -392,6 +392,29 @@ pub fn remove_file(name: &'static str, path: &Path) -> Result<()> {
 }
 
 pub fn ensure_file_removed(name: &'static str, path: &Path) -> Result<()> {
+    // FIXME: working through the fix for this here
+    // call remove_file instead of fs::remove_file here
+    // let result = remove_file(name, path);
+    // if let Err(err) = &result {
+    //   the error (if any) looks like this with dbg!()
+    // Error {
+    //     context: "could not remove \'f\' file: \'/var/folders/dm/jw1kkghn0pgcz274jdp0njhr0000gn/T/rustupndrqBy/f\'",
+    //     source: Operation {
+    //         error: Os {
+    //             code: 2,
+    //             kind: NotFound,
+    //             message: "No such file or directory",
+    //         },
+    //         total_delay: 0ns,
+    //         tries: 1,
+    //     },
+    //  } 
+    // so in theory i think we can replicate the same behavior by just digging out the kind
+    // in the above error and returning Ok(()) if its `NotFound` as it does below
+    // getting to that kind is harder than i thought, though, still trying to work out the
+    // best way to do that.
+    // }
+
     let result = fs::remove_file(path);
     if let Err(err) = &result {
         if err.kind() == io::ErrorKind::NotFound {
